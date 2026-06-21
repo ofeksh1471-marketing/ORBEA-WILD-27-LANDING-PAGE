@@ -205,7 +205,7 @@ select {
 }
 
 .hero h1 {
-  font-size: clamp(112px, 20vw, 320px);
+  font-size: clamp(88px, 14vw, 220px);
   font-weight: 800;
   letter-spacing: 0;
   line-height: 0.8;
@@ -548,11 +548,18 @@ h2 {
   line-height: 1.08;
   max-width: calc(100% - 52px);
   position: relative;
+  justify-self: end;
+  text-align: right;
   text-wrap: nowrap;
   transition: opacity 180ms ease, transform 180ms ease;
   unicode-bidi: plaintext;
   white-space: nowrap !important;
   z-index: 1;
+}
+
+.expand-toggle > .compact-title {
+  font-size: clamp(16px, 1.35vw, 24px);
+  max-width: 100%;
 }
 
 .expand-toggle b {
@@ -967,7 +974,7 @@ h2 {
   }
 
   .hero h1 {
-    font-size: clamp(92px, 22vw, 184px);
+    font-size: clamp(76px, 16vw, 142px);
   }
 
   .hero-slogan {
@@ -1027,7 +1034,7 @@ h2 {
   }
 
   .hero h1 {
-    font-size: clamp(76px, 24vw, 112px);
+    font-size: clamp(58px, 16vw, 76px);
     line-height: 0.84;
   }
 
