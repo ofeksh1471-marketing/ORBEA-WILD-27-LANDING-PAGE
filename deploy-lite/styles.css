@@ -548,7 +548,7 @@ h2 {
   line-height: 1.08;
   max-width: calc(100% - 52px);
   position: relative;
-  justify-self: end;
+  justify-self: start;
   text-align: right;
   text-wrap: nowrap;
   transition: opacity 180ms ease, transform 180ms ease;
