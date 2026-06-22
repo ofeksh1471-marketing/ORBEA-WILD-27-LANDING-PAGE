@@ -25,14 +25,25 @@ accordionGroups.forEach((group) => {
 const revealItems = document.querySelectorAll(".reveal-on-scroll");
 
 const lazyImages = document.querySelectorAll("img[data-src]");
+const mediaVersion = "20260622-2";
+const versionMediaUrl = (url) => `${url}${url.includes("?") ? "&" : "?"}v=${mediaVersion}`;
+
+const versionSrcset = (srcset) =>
+  srcset
+    .split(",")
+    .map((candidate) => {
+      const [url, descriptor] = candidate.trim().split(/\s+/, 2);
+      return descriptor ? `${versionMediaUrl(url)} ${descriptor}` : versionMediaUrl(url);
+    })
+    .join(", ");
 
 const loadLazyImage = (image) => {
   if (image.dataset.srcset) {
-    image.srcset = image.dataset.srcset;
+    image.srcset = versionSrcset(image.dataset.srcset);
     image.removeAttribute("data-srcset");
   }
 
-  image.src = image.dataset.src;
+  image.src = versionMediaUrl(image.dataset.src);
   image.removeAttribute("data-src");
 };
 
@@ -150,8 +161,8 @@ function showModel(index) {
       return;
     }
 
-    modelImage.src = `${model.image}-1800.webp`;
-    modelImage.srcset = `${model.image}-900.webp 900w, ${model.image}-1800.webp 1800w`;
+    modelImage.src = `${model.image}-1800.webp?v=${mediaVersion}`;
+    modelImage.srcset = `${model.image}-900.webp?v=${mediaVersion} 900w, ${model.image}-1800.webp?v=${mediaVersion} 1800w`;
     modelImage.style.opacity = "1";
     modelImage.style.transform = "translateY(0) scale(1)";
   }, 160);
