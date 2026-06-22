@@ -24,6 +24,36 @@ accordionGroups.forEach((group) => {
 
 const revealItems = document.querySelectorAll(".reveal-on-scroll");
 
+const lazyImages = document.querySelectorAll("img[data-src]");
+
+const loadLazyImage = (image) => {
+  if (image.dataset.srcset) {
+    image.srcset = image.dataset.srcset;
+    image.removeAttribute("data-srcset");
+  }
+
+  image.src = image.dataset.src;
+  image.removeAttribute("data-src");
+};
+
+if ("IntersectionObserver" in window) {
+  const imageObserver = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (entry.isIntersecting) {
+          loadLazyImage(entry.target);
+          imageObserver.unobserve(entry.target);
+        }
+      });
+    },
+    { rootMargin: "600px 0px", threshold: 0.01 }
+  );
+
+  lazyImages.forEach((image) => imageObserver.observe(image));
+} else {
+  lazyImages.forEach(loadLazyImage);
+}
+
 if ("IntersectionObserver" in window) {
   const revealObserver = new IntersectionObserver(
     (entries) => {
@@ -78,10 +108,10 @@ document.querySelectorAll("[data-video-frame]").forEach((frame) => {
 });
 
 const models = [
-  { name: "ORBEA WILD LT M20", image: "assets/media/Models/WILD LT M20.jpg" },
-  { name: "ORBEA WILD LT M10", image: "assets/media/Models/WILD LT M10.jpg" },
-  { name: "ORBEA WILD LT M-TEAM RS", image: "assets/media/Models/WILD LT M-TEAM RS.jpg" },
-  { name: "ORBEA WILD LT M-LTD RS", image: "assets/media/Models/WILD M LT M-LTD RS.jpg" },
+  { name: "ORBEA WILD LT M20", image: "assets/media/Models/WILD LT M20" },
+  { name: "ORBEA WILD LT M10", image: "assets/media/Models/WILD LT M10" },
+  { name: "ORBEA WILD LT M-TEAM RS", image: "assets/media/Models/WILD LT M-TEAM RS" },
+  { name: "ORBEA WILD LT M-LTD RS", image: "assets/media/Models/WILD M LT M-LTD RS" },
 ];
 
 const modelName = document.querySelector("#model-name");
@@ -91,6 +121,7 @@ const modelPlaceholder = document.querySelector(".model-placeholder span");
 const missingModelImages = new Set();
 let activeModel = 0;
 let modelTimer;
+let modelsInView = false;
 
 modelImage.addEventListener("error", () => {
   if (modelImage.dataset.currentModelImage) {
@@ -109,16 +140,18 @@ function showModel(index) {
   window.setTimeout(() => {
     modelImage.alt = model.name;
     modelImage.dataset.currentModelImage = model.image;
-    modelImage.dataset.fallbackLabel = `${model.name}.jpg`;
-    modelPlaceholder.textContent = `${model.name}.jpg`;
+    modelImage.dataset.fallbackLabel = `${model.name}.webp`;
+    modelPlaceholder.textContent = `${model.name}.webp`;
 
     if (missingModelImages.has(model.image)) {
       modelImage.removeAttribute("src");
+      modelImage.removeAttribute("srcset");
       modelImage.closest(".media-card")?.classList.remove("has-media");
       return;
     }
 
-    modelImage.src = model.image;
+    modelImage.src = `${model.image}-1800.webp`;
+    modelImage.srcset = `${model.image}-900.webp 900w, ${model.image}-1800.webp 1800w`;
     modelImage.style.opacity = "1";
     modelImage.style.transform = "translateY(0) scale(1)";
   }, 160);
@@ -130,6 +163,7 @@ function showModel(index) {
 
 function startModelRotation() {
   clearInterval(modelTimer);
+  if (!modelsInView) return;
   modelTimer = setInterval(() => showModel(activeModel + 1), 3200);
 }
 
@@ -145,8 +179,31 @@ models.forEach((model, index) => {
   modelTabs.append(tab);
 });
 
-showModel(0);
-startModelRotation();
+modelTabs.firstElementChild?.classList.add("active");
+
+const modelsSection = document.querySelector("#models");
+
+if ("IntersectionObserver" in window) {
+  const modelObserver = new IntersectionObserver(
+    ([entry]) => {
+      modelsInView = entry.isIntersecting;
+
+      if (modelsInView) {
+        showModel(activeModel);
+        startModelRotation();
+      } else {
+        clearInterval(modelTimer);
+      }
+    },
+    { rootMargin: "240px 0px", threshold: 0.01 }
+  );
+
+  modelObserver.observe(modelsSection);
+} else {
+  modelsInView = true;
+  showModel(0);
+  startModelRotation();
+}
 
 document.querySelector(".lead-form").addEventListener("submit", async (event) => {
   event.preventDefault();
