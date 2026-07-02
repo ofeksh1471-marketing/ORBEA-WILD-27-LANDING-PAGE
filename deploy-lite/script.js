@@ -215,28 +215,3 @@ if ("IntersectionObserver" in window) {
   showModel(0);
   startModelRotation();
 }
-
-document.querySelector(".lead-form").addEventListener("submit", async (event) => {
-  event.preventDefault();
-  const form = event.currentTarget;
-  const button = form.querySelector(".submit-button");
-  const formData = new FormData(form);
-
-  button.disabled = true;
-  button.textContent = "שולח...";
-
-  try {
-    await fetch("/", {
-      method: "POST",
-      headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      body: new URLSearchParams(formData).toString(),
-    });
-
-    form.reset();
-    form.classList.add("submitted");
-    button.textContent = "נשלח";
-  } catch (error) {
-    button.disabled = false;
-    button.textContent = "נסה שוב";
-  }
-});
