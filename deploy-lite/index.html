@@ -368,5 +368,39 @@
     </footer>
 
     <script src="script.js?v=20260702-1"></script>
+    <script>
+      (function () {
+        function sendHeightToParent() {
+          const height = Math.max(
+            document.body.scrollHeight,
+            document.documentElement.scrollHeight,
+            document.body.offsetHeight,
+            document.documentElement.offsetHeight
+          );
+
+          if (window.parent && window.parent !== window) {
+            window.parent.postMessage(
+              {
+                type: "update-iframe-height",
+                height: height,
+              },
+              "*"
+            );
+          }
+        }
+
+        window.addEventListener("load", sendHeightToParent);
+        window.addEventListener("resize", sendHeightToParent);
+
+        if (window.ResizeObserver) {
+          const observer = new ResizeObserver(() => {
+            sendHeightToParent();
+          });
+          observer.observe(document.body);
+        } else {
+          setTimeout(sendHeightToParent, 1000);
+        }
+      })();
+    </script>
   </body>
 </html>
