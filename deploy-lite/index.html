@@ -426,5 +426,28 @@
         setTimeout(sendHeight, 3000);
       })();
     </script>
+    <script>
+      document.addEventListener("click", function (e) {
+        const link = e.target.closest('a[href^="#"]');
+
+        if (!link) return;
+
+        const target = document.querySelector(link.hash);
+
+        if (!target) return;
+
+        const rect = target.getBoundingClientRect();
+
+        window.parent.postMessage(
+          {
+            type: "anchorClicked",
+            offset: rect.top + window.scrollY,
+          },
+          "*"
+        );
+
+        e.preventDefault();
+      });
+    </script>
   </body>
 </html>
